@@ -1,0 +1,9 @@
+sample:
+  name: IoT Creators
+tests:
+  samples.nrf9160.iot_creators:
+    build_only: true
+    platform_allow: thingy91_nrf9160_ns
+    integration_platforms:
+      - thingy91_nrf9160_ns
+    tags: ci_build
