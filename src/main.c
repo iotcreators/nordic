@@ -21,6 +21,8 @@
 /* Defines */
 #define MODEM_APN "cdp.iot.t-mobile.nl"
 #define TEMP_CALIBRATION_OFFSET 3
+#define RECV_BUF_SIZE 2048
+#define RCV_POLL_TIMEOUT_MS 1000 /* Milliseconds */
 
 /* Sensor data */
 const struct device *bme_680;
@@ -35,9 +37,12 @@ static struct sockaddr_storage host_addr;
 /* Workqueues */
 static struct k_work_delayable server_transmission_work;
 static struct k_work_delayable data_fetch_work;
+static struct k_work_delayable poll_data_work;
 
 K_SEM_DEFINE(lte_connected, 0, 1);
 struct modem_param_info modem_param;
+
+static char recv_buf[RECV_BUF_SIZE];
 
 /* 
  * *** Static functions of main.c ***
@@ -80,6 +85,26 @@ static void transmit_udp_data(char *data, size_t len)
 	}
 }
 
+static int receive_udp_data(char *buf, int buf_size)
+{
+	int bytes;
+	bytes = recv(client_fd, buf, buf_size, 0);
+	if (bytes < 0) {
+		printk("recv() failed, err %d\n", errno);
+	}
+	else if (bytes > 0) {
+		// Make sure buf is NULL terminated (for safe use)
+		if (bytes < buf_size) {
+			buf[bytes] = '\0';
+		} else {
+			buf[buf_size - 1] = '\0';
+		}
+		printk("Recived UDP data, length: %u, data: %s\n", bytes, buf);
+		return bytes;
+	}
+	return 0;
+}
+
 /* Event Handler - used when pressing the button */
 static void ui_evt_handler(struct ui_evt evt)
 {
@@ -92,6 +117,24 @@ static void ui_evt_handler(struct ui_evt evt)
 			sprintf(data_output, "{\"Msg\":\"Event: Thingy:91 button pressed, %s\"}",imei);
 			transmit_udp_data(data_output, strlen(data_output));
 		}
+	}
+}
+
+/* Event Handler - used when data received via UDP */
+static void udp_evt_handler(char *buf)
+{
+	printk("Handling UDP data, data: %s\n", buf);
+
+	int err = 0;
+	if (strcmp(buf, "buzzer-on") == 0) {
+		err = ui_buzzer_set_frequency(3000, 50);
+	}
+	else if (strcmp(buf, "buzzer-off") == 0)	{
+		err = ui_buzzer_set_frequency(0, 0);
+	}
+
+	if (err < 0) {
+		printk("Failed to start the buzzer, %d\n", err);
 	}
 }
 
@@ -139,10 +182,34 @@ static void server_transmission_work_fn(struct k_work *work)
 	k_work_schedule(&server_transmission_work, K_SECONDS(CONFIG_UDP_DATA_UPLOAD_FREQUENCY_SECONDS));
 }
 
+static void poll_data_work_fn(struct k_work *work)
+{
+	if (socket_open){
+		struct pollfd fds[1];
+		int ret = 0;
+
+		fds[0].fd = client_fd;
+		fds[0].events = POLLIN;
+		fds[0].revents = 0;
+
+		ret = poll(fds, 1, RCV_POLL_TIMEOUT_MS);
+		if (ret > 0) {
+			int bytes;
+			bytes = receive_udp_data(recv_buf, RECV_BUF_SIZE);
+			if (bytes > 0) {
+				udp_evt_handler(recv_buf);
+			}
+		}
+	}
+	/* Reschedule work task */
+	k_work_schedule(&poll_data_work, K_SECONDS(CONFIG_UDP_DATA_DOWNLOAD_FREQUENCY_SECONDS));
+}
+
 static void work_init(void)
 {
 	k_work_init_delayable(&server_transmission_work, server_transmission_work_fn);
 	k_work_init_delayable(&data_fetch_work, data_fetch_work_fn);
+	k_work_init_delayable(&poll_data_work, poll_data_work_fn);
 }
 
 #if defined(CONFIG_NRF_MODEM_LIB)
@@ -390,4 +457,5 @@ void main(void)
 	initial_data_transmission();
 	k_work_schedule(&data_fetch_work, K_NO_WAIT);
 	k_work_schedule(&server_transmission_work, K_SECONDS(2));	
+	k_work_schedule(&poll_data_work, K_SECONDS(3));
 }
