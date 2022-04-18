@@ -15,7 +15,7 @@ config UDP_DATA_UPLOAD_FREQUENCY_SECONDS
 	default 900
 
 config UDP_DATA_DOWNLOAD_FREQUENCY_SECONDS
-	int "How often data is polled frpm the server"
+	int "How often data is polled from the server"
 	default 900
 
 config UDP_SERVER_ADDRESS_STATIC
