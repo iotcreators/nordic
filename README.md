@@ -31,14 +31,14 @@ and you know how to decode payload sent from a device and how to send a downlink
     an icon named *Add Build Configuration* should appear near the application name. Click it.
 11. In the *Add Build Configuration* form leave default values in all fields and click the *Build Configuration* button.
 12. Wait several minutes to build.
-13. Open *nRF Connect for Desktop* and open *Programmer* (install it if needed).
-14. Use *Add file* and search for **app_signed.hex** in **build\zephyr** folder of your application.
-15. Select *Nordic Thingy:91* from the *SELECT DEVICE* dropdown.
-16. After clicking *Write* you will see the *MCUboot DFU* popup.
-17. Connect Thingy:91 with a USB cable. Enter boot mode by turning it on while pressing the main button.
+13. Connect Thingy:91 with a USB cable. Enter boot mode by turning it on while pressing the main button.
+14. Open *nRF Connect for Desktop* and open *Programmer* (install it if needed).
+15. Use *Add file* and search for **app_signed.hex** in **build\zephyr** folder of your application.
+16. Select *Nordic Thingy:91* from the *SELECT DEVICE* dropdown.
+17. After clicking *Write* you will see the *MCUboot DFU* popup.
 18. Hit the *Write* button in the *MCUboot DFU* popup.
-19. Wait 20-40 seconds unit success message is displayed.
-20. Turn off and turn on the device to run the application.
+19. Wait 20-40 seconds until success message is displayed.
+20. Power cycle the device to start the application.
 
 ## LED indication
 
