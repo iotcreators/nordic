@@ -14,7 +14,10 @@ and you know how to decode payload sent from a device and how to send a downlink
 
 ## Requirements
 
+ * Thingy:91 
  * nRF Connect SDK 1.8.0
+    * (tested on v1.7.0, v1.8.0, v1.9.1)
+ 
 
 ## Installation
 

@@ -7,7 +7,7 @@
 #include <zephyr.h>
 #include <stdio.h>
 #include <modem/lte_lc.h> 		// LTE link control
-#include <modem/at_cmd.h> 		// includes AT command handling
+#include <nrf_modem_at.h>		// includes AT command handling, removed deprecated API
 #include <modem/modem_info.h> 	// includes modem info module
 #include <net/socket.h>			// includes TCP/IP socket handling
 #include <device.h> 			// Zephyr device API
@@ -315,10 +315,10 @@ static void modem_init(void)
 		}
 
 		/* Enable 3GGP CME error codes*/
-		at_cmd_write("AT+CMEE=1", NULL, 0, NULL);
+		nrf_modem_at_printf("AT+CMEE=%d", 1);
 		/* Read out Modem IMEI */
 		printk("[INFO] Read Modem IMEI\n");
-		at_cmd_write("AT+CGSN=1", response, sizeof(response), NULL);
+		err = nrf_modem_at_cmd(response, sizeof(response), "AT+CGSN=%d", 1);
 		if (err) {
 			printk("Read Modem IMEI failed, err %d\n", err);
 			return;
@@ -330,13 +330,13 @@ static void modem_init(void)
 		printk("[INFO] Setting up the APN\n");
 		char *apn_stat = "AT%XAPNSTATUS=1,\"" MODEM_APN "\"";
 		char *at_cgdcont = "AT+CGDCONT=0,\"IPV4V6\",\"" MODEM_APN "\"";
-		at_cmd_write(apn_stat, NULL, 0, NULL); // allow use of APN
-		err = at_cmd_write(at_cgdcont, NULL, 0, NULL); // use APN for PDP context 0 (default bearer)
+		nrf_modem_at_printf(apn_stat); // allow use of APN
+		err = nrf_modem_at_printf(at_cgdcont); // use conf. APN for PDP context 0 (default LTE bearer)
 		if (err) {
 			printk("AT+CGDCONT set cmd failed, err %d\n", err);
 			return;
 		}
-		err = at_cmd_write("AT+CGDCONT?", response, sizeof(response), NULL);
+		err = nrf_modem_at_cmd(response, sizeof(response), "AT+CGDCONT?", NULL);
 		if (err) {
 			printk("APN check failed, err %d\n", err);
 			return;
