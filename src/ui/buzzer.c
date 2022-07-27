@@ -45,15 +45,20 @@ static int pwm_out(uint32_t frequency, uint8_t intensity)
 	 * disables the PWM, but not before the current period is finished.
 	 */
 	if (prev_period) {
-		pwm_pin_set_usec(pwm_dev, CONFIG_UI_BUZZER_PIN,
-				 prev_period, 0, 0);
+		#if IS_ZEPHYR_VERSION_GT(2, 7)
+			pwm_pin_set_usec(pwm_dev, 0, prev_period, 0, 0);
+		#else
+			pwm_pin_set_usec(pwm_dev, CONFIG_UI_BUZZER_PIN, prev_period, 0, 0);
+		#endif
 		k_sleep(K_MSEC(MAX((prev_period / USEC_PER_MSEC), 1)));
 	}
 
 	prev_period = period;
-
-	return pwm_pin_set_usec(pwm_dev, CONFIG_UI_BUZZER_PIN,
-				period, duty_cycle, 0);
+	#if IS_ZEPHYR_VERSION_GT(2, 7)
+		return pwm_pin_set_usec(pwm_dev, 0, period, duty_cycle, 0);
+	#else
+		return pwm_pin_set_usec(pwm_dev, CONFIG_UI_BUZZER_PIN, period, duty_cycle, 0);
+	#endif
 }
 
 static void buzzer_disable(void)

@@ -55,6 +55,12 @@ static int pwm_out(uint32_t pin, uint32_t period_us, uint32_t duty_cycle_us)
 	 * allow changing period while PWM is running. Setting pulse to 0
 	 * disables the PWM, but not before the current period is finished.
 	 */
+
+	// hack / fix to retrieve PWM channel number instead of pin for Zephyr 3.x
+	#if IS_ZEPHYR_VERSION_GT(2, 7)
+		pin = pin - CONFIG_UI_NMOS_1_PIN;
+	#endif
+
 	if (current_period_us != period_us) {
 		pwm_pin_set_usec(pwm_dev, pin, current_period_us, 0, 0);
 		k_sleep(K_MSEC(MAX((current_period_us / USEC_PER_MSEC), 1)));
@@ -188,11 +194,11 @@ int ui_nmos_init(void)
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(nmos_pins); i++) {
-		pwm_pin_set_usec(pwm_dev,
-				 nmos_pins[i].pin,
-				 DEFAULT_PERIOD_US,
-				 0,
-				 0);
+		#if IS_ZEPHYR_VERSION_GT(2, 7)
+			pwm_pin_set_usec(pwm_dev, i, DEFAULT_PERIOD_US, 0, 0);
+		#else
+			pwm_pin_set_usec(pwm_dev, nmos_pins[i].pin, DEFAULT_PERIOD_US, 0, 0);
+		#endif
 	}
 
 	current_period_us = DEFAULT_PERIOD_US;

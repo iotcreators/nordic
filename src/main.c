@@ -7,7 +7,7 @@
 #include <zephyr.h>
 #include <stdio.h>
 #include <modem/lte_lc.h> 		// LTE link control
-#include <nrf_modem_at.h>		// includes AT command handling, removed deprecated API
+#include <nrf_modem_at.h>		// includes AT command handling
 #include <modem/modem_info.h> 	// includes modem info module
 #include <net/socket.h>			// includes TCP/IP socket handling
 #include <device.h> 			// Zephyr device API

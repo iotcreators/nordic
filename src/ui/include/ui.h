@@ -16,6 +16,7 @@
 
 #include <zephyr.h>
 #include <dk_buttons_and_leds.h>
+#include <version.h>				// add MACRO for Zephyr Version check
 
 #include "led_effect.h"
 
@@ -42,6 +43,10 @@ extern "C" {
 #define UI_LED_BLINK(x)			((x) << 8)
 #define UI_LED_GET_ON(x)		((x) & 0xFF)
 #define UI_LED_GET_BLINK(x)		(((x) >> 8) & 0xFF)
+
+#define IS_ZEPHYR_VERSION_GT(major, minor) 		\
+	(KERNEL_VERSION_MAJOR > (major)) ||			\
+    (KERNEL_VERSION_MAJOR == (major) && KERNEL_VERSION_MINOR > (minor))
 
 #ifdef CONFIG_UI_LED_USE_PWM
 
