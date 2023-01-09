@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include <stdio.h>
 #include <modem/lte_lc.h> 		// LTE link control
 #include <nrf_modem_at.h>		// includes AT command handling
 #include <modem/modem_info.h> 	// includes modem info module
-#include <net/socket.h>			// includes TCP/IP socket handling
-#include <device.h> 			// Zephyr device API
-#include <drivers/sensor.h> 	// Zephyr sensor driver API
+#include <zephyr/net/socket.h>			// includes TCP/IP socket handling
+#include <zephyr/device.h> 			// Zephyr device API
+#include <zephyr/drivers/sensor.h> 	// Zephyr sensor driver API
 
 /* UI drivers for Thingy:91 */
 #include "buzzer.h"
@@ -422,7 +422,7 @@ void main(void)
 	/* Init routines */
 	ui_init(ui_evt_handler);
 	ui_led_set_effect(UI_LTE_CONNECTING);
-	bme_680 = device_get_binding(DT_LABEL(DT_INST(0, bosch_bme680)));
+	bme_680 = DEVICE_DT_GET(DT_INST(0, bosch_bme680));
 	work_init();
 
 	/* Initialize the modem before calling configure_low_power(). This is

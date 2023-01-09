@@ -14,7 +14,7 @@
 #ifndef UI_H__
 #define UI_H__
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include <dk_buttons_and_leds.h>
 #include <version.h>				// add MACRO for Zephyr Version check
 

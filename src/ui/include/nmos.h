@@ -12,7 +12,7 @@
 #ifndef UI_NMOS_H__
 #define UI_NMOS_H__
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 
 #ifdef __cplusplus
 extern "C" {

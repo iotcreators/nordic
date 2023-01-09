@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <zephyr.h>
-#include <sys/util.h>
-#include <drivers/gpio.h>
-#include <drivers/pwm.h>
+#include <zephyr/kernel.h>
+#include <zephyr/sys/util.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/pwm.h>
 
 #include "ui.h"
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ui_nmos, CONFIG_UI_LOG_LEVEL);
 
 /*
@@ -165,10 +165,9 @@ int ui_nmos_init(void)
 {
 	int err = 0;
 
-	gpio_dev = device_get_binding(DT_LABEL(DT_NODELABEL(gpio0)));
+	gpio_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
 	if (!gpio_dev) {
-		LOG_ERR("Could not bind to device %s",
-			log_strdup(DT_LABEL(DT_NODELABEL(gpio0))));
+		LOG_ERR("Could not bind to device");
 		return -ENODEV;
 	}
 
@@ -189,7 +188,7 @@ int ui_nmos_init(void)
 	pwm_dev = device_get_binding(CONFIG_UI_NMOS_PWM_DEV_NAME);
 	if (!pwm_dev) {
 		LOG_ERR("Could not bind to device %s",
-			log_strdup(CONFIG_UI_NMOS_PWM_DEV_NAME));
+			CONFIG_UI_NMOS_PWM_DEV_NAME);
 		return -ENODEV;
 	}
 

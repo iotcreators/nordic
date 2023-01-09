@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <zephyr.h>
-#include <drivers/pwm.h>
+#include <zephyr/kernel.h>
+#include <zephyr/drivers/pwm.h>
 #include <string.h>
 
 #include "ui.h"
 #include "led_pwm.h"
 #include "led_effect.h"
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ui_led_pwm, CONFIG_UI_LOG_LEVEL);
 
 struct led {

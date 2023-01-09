@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <zephyr.h>
-#include <drivers/pwm.h>
+#include <zephyr/kernel.h>
+#include <zephyr/drivers/pwm.h>
 
 #include "ui.h"
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(buzzer, CONFIG_UI_LOG_LEVEL);
 
 #define BUZZER_MIN_FREQUENCY		CONFIG_UI_BUZZER_MIN_FREQUENCY
@@ -99,7 +99,7 @@ int ui_buzzer_init(void)
 
 	pwm_dev = device_get_binding(dev_name);
 	if (!pwm_dev) {
-		LOG_ERR("Could not bind to device %s", log_strdup(dev_name));
+		LOG_ERR("Could not bind to device %s", dev_name);
 		err = -ENODEV;
 	}
 
