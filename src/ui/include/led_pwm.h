@@ -12,7 +12,7 @@
 #ifndef UI_LEDS_H__
 #define UI_LEDS_H__
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include "ui.h"
 
 #ifdef __cplusplus
